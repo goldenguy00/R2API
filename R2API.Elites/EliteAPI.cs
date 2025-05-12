@@ -26,7 +26,7 @@ public static partial class EliteAPI
     public const string PluginGUID = R2API.PluginGUID + ".elites";
     public const string PluginName = R2API.PluginName + ".Elites";
 
-    public static ObservableCollection<CustomElite?>? EliteDefinitions = new ObservableCollection<CustomElite?>();
+    public static ObservableCollection<CustomElite> EliteDefinitions = new ObservableCollection<CustomElite>();
 
     /// <summary>
     /// Return true if the submodule is loaded.
@@ -260,10 +260,10 @@ public static partial class EliteAPI
         return AddInternal(elite, Assembly.GetCallingAssembly());
     }
 
-    internal static bool AddInternal(CustomElite customElite, Assembly addingAssembly)
+    internal static bool AddInternal(CustomElite? customElite, Assembly addingAssembly)
     {
 
-        if (!customElite.EliteDef)
+        if (!customElite?.EliteDef)
         {
             throw new ArgumentNullException("customElite.EliteDef");
         }
@@ -274,7 +274,7 @@ public static partial class EliteAPI
             return false;
         }
 
-        if (customElite.EliteTierDefs == null || customElite.EliteTierDefs.Count() <= 0)
+        if (customElite.EliteTierDefs == null || !customElite.EliteTierDefs.Any())
         {
             throw new ArgumentNullException("customElite.EliteTierDefs");
         }
@@ -310,7 +310,7 @@ public static partial class EliteAPI
     /// <summary>
     /// Returns the current elite tier definitions used by the Combat Director for doing its elite spawning while doing a run.
     /// </summary>
-    public static CombatDirector.EliteTierDef?[]? GetCombatDirectorEliteTiers()
+    public static CombatDirector.EliteTierDef[] GetCombatDirectorEliteTiers()
     {
         EliteAPI.SetHooks();
         return CombatDirector.eliteTiers;
@@ -327,7 +327,7 @@ public static partial class EliteAPI
     /// You can get the current array used by the director with <see cref="GetCombatDirectorEliteTiers"/>
     /// </summary>
     /// <param name="newEliteTiers">The new elite tiers that will be used by the combat director.</param>
-    public static void OverrideCombatDirectorEliteTiers(CombatDirector.EliteTierDef?[]? newEliteTiers)
+    public static void OverrideCombatDirectorEliteTiers(CombatDirector.EliteTierDef[] newEliteTiers)
     {
         EliteAPI.SetHooks();
         CombatDirector.eliteTiers = newEliteTiers;
@@ -340,7 +340,7 @@ public static partial class EliteAPI
     /// Because when doing EliteAPI.Add, the API will add your elite to the specified tiers <see cref="CustomElite.EliteTierDefs"/>.
     /// </summary>
     /// <param name="eliteTierDef">The new elite tier to add.</param>
-    public static int AppendCustomEliteTier(CombatDirector.EliteTierDef? eliteTierDef)
+    public static int AppendCustomEliteTier(CombatDirector.EliteTierDef eliteTierDef)
     {
         EliteAPI.SetHooks();
         return AddCustomEliteTier(eliteTierDef, -1);
@@ -353,7 +353,7 @@ public static partial class EliteAPI
     /// Because when doing EliteAPI.Add, the API will add your elite to the specified tiers <see cref="CustomElite.EliteTierDefs"/>.
     /// </summary>
     /// <param name="eliteTierDef">The new elite tier to add.</param>
-    public static int AddCustomEliteTier(CombatDirector.EliteTierDef? eliteTierDef)
+    public static int AddCustomEliteTier(CombatDirector.EliteTierDef eliteTierDef)
     {
         EliteAPI.SetHooks();
         var indexToInsertAt = Array.FindIndex(GetCombatDirectorEliteTiers(), x => x.costMultiplier >= eliteTierDef.costMultiplier);
@@ -375,7 +375,7 @@ public static partial class EliteAPI
     /// </summary>
     /// <param name="eliteTierDef">The new elite tier to add.</param>
     /// <param name="indexToInsertAt">Optional index to specify if you want to insert a cheaper elite tier</param>
-    public static int AddCustomEliteTier(CombatDirector.EliteTierDef? eliteTierDef, int indexToInsertAt = -1)
+    public static int AddCustomEliteTier(CombatDirector.EliteTierDef eliteTierDef, int indexToInsertAt = -1)
     {
         EliteAPI.SetHooks();
         var eliteTiersSize = VanillaEliteTierCount + CustomEliteTierCount;
