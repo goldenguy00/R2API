@@ -22,7 +22,7 @@ public class CustomElite
     /// <summary>
     /// The TextureRamp for this elite, can be omitted
     /// </summary>
-    public Texture2D EliteRamp;
+    public Texture2D? EliteRamp;
 
     /// <summary>
     /// Elite tier(s) that the eliteDef will be on.
@@ -48,7 +48,7 @@ public class CustomElite
     }
 
     /// <inheritdoc cref="CustomElite(string, EquipmentDef, Color32, string, IEnumerable{CombatDirector.EliteTierDef})"/>
-    public CustomElite(string name, EquipmentDef equipmentDef, Color32 color, string modifierToken, IEnumerable<CombatDirector.EliteTierDef> eliteTierDefs, Texture2D eliteRamp)
+    public CustomElite(string name, EquipmentDef equipmentDef, Color32 color, string modifierToken, IEnumerable<CombatDirector.EliteTierDef> eliteTierDefs, Texture2D? eliteRamp)
     {
         EliteDef = ScriptableObject.CreateInstance<EliteDef>();
         EliteDef.name = name;
@@ -65,8 +65,9 @@ public class CustomElite
         EliteDef = eliteDef;
         EliteTierDefs = eliteTierDefs;
     }
+
     /// <inheritdoc cref="CustomElite(string, EquipmentDef, Color32, string, IEnumerable{CombatDirector.EliteTierDef})"/>
-    public CustomElite(EliteDef eliteDef, IEnumerable<CombatDirector.EliteTierDef> eliteTierDefs, Texture2D eliteRamp)
+    public CustomElite(EliteDef eliteDef, IEnumerable<CombatDirector.EliteTierDef> eliteTierDefs, Texture2D? eliteRamp)
     {
         EliteDef = eliteDef;
         EliteTierDefs = eliteTierDefs;

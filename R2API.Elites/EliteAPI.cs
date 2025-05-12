@@ -26,7 +26,17 @@ public static partial class EliteAPI
     public const string PluginGUID = R2API.PluginGUID + ".elites";
     public const string PluginName = R2API.PluginName + ".Elites";
 
+    public static int VanillaEliteTierCount;
+    public static int CustomEliteTierCount => CustomEliteTierDefs.Count;
+    public static CombatDirector.EliteTierDef[] VanillaEliteTiers { get; private set; }
+    public static CombatDirector.EliteTierDef VanillaFirstTierDef { get; private set; }
+    public static CombatDirector.EliteTierDef VanillaEliteOnlyFirstTierDef { get; private set; }
+
     public static ObservableCollection<CustomElite> EliteDefinitions = new ObservableCollection<CustomElite>();
+
+    private static readonly List<CombatDirector.EliteTierDef> CustomEliteTierDefs = new List<CombatDirector.EliteTierDef>();
+
+    #region Ctor
 
     /// <summary>
     /// Return true if the submodule is loaded.
@@ -50,9 +60,14 @@ public static partial class EliteAPI
         ElitesPlugin.Logger.LogDebug("EliteAPI.cctor finished.");
     }
 
-    private static bool _hooksEnabled = false;
+    #endregion Ctor
 
-    #region ModHelper Events and Hooks
+    #region Internal ModHelper Events and Hooks
+
+    private static bool _hooksEnabled;
+
+    private static bool _combatDirectorInitialized;
+
     internal static void SetHooks()
     {
         if (_hooksEnabled)
@@ -203,17 +218,12 @@ public static partial class EliteAPI
 
             foreach (var eliteTierDef in customElite.EliteTierDefs)
             {
-                if (eliteTierDef.eliteTypes == null)
+                eliteTierDef.eliteTypes ??= Array.Empty<EliteDef>();
+
+                var isCustomEliteAlreadyInEliteTierDef = eliteTierDef.eliteTypes.Contains(customElite.EliteDef);
+                if (isCustomEliteAlreadyInEliteTierDef)
                 {
-                    eliteTierDef.eliteTypes = Array.Empty<EliteDef>();
-                }
-                else
-                {
-                    var isCustomEliteAlreadyInEliteTierDef = eliteTierDef.eliteTypes.Any(e => e == customElite.EliteDef);
-                    if (isCustomEliteAlreadyInEliteTierDef)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 HG.ArrayUtils.ArrayAppend(ref eliteTierDef.eliteTypes, customElite.EliteDef);
@@ -229,20 +239,23 @@ public static partial class EliteAPI
     private static void RetrieveVanillaEliteTierCount(ILContext il)
     {
         var c = new ILCursor(il);
-        if (c.TryGotoNext(
+        if (!c.TryGotoNext(
                 i => i.MatchLdcI4(out VanillaEliteTierCount),
                 i => i.MatchNewarr<CombatDirector.EliteTierDef>()))
-        {
-        }
-        else
         {
             ElitesPlugin.Logger.LogError("Failed finding IL Instructions. Aborting RetrieveVanillaEliteTierCount IL Hook");
         }
     }
 
-    #endregion ModHelper Events and Hooks
+    private static CombatDirector.EliteTierDef[] RetrieveVanillaEliteTiers() => CombatDirector.eliteTiers;
 
-    #region Add Methods
+    private static CombatDirector.EliteTierDef RetrieveFirstVanillaTierDef() => CombatDirector.eliteTiers[1];
+
+    private static CombatDirector.EliteTierDef RetrieveVanillaEliteOnlyFirstTierDef() => CombatDirector.eliteTiers[2];
+
+    #endregion Internal ModHelper Events and Hooks
+
+    #region ContentAddition Methods
 
     /// <summary>
     /// Add a custom elite to the elite catalog.
@@ -262,7 +275,6 @@ public static partial class EliteAPI
 
     internal static bool AddInternal(CustomElite? customElite, Assembly addingAssembly)
     {
-
         if (!customElite?.EliteDef)
         {
             throw new ArgumentNullException("customElite.EliteDef");
@@ -284,28 +296,9 @@ public static partial class EliteAPI
         return true;
     }
 
-    #endregion Add Methods
+    #endregion ContentAddition Methods
 
-    #region Combat Director Modifications
-
-    private static CombatDirector.EliteTierDef[] RetrieveVanillaEliteTiers()
-    {
-        return CombatDirector.eliteTiers;
-    }
-
-    private static CombatDirector.EliteTierDef RetrieveFirstVanillaTierDef()
-    {
-        return CombatDirector.eliteTiers[1];
-    }
-
-    private static CombatDirector.EliteTierDef RetrieveVanillaEliteOnlyFirstTierDef()
-    {
-        return CombatDirector.eliteTiers[2];
-    }
-
-    public static CombatDirector.EliteTierDef[] VanillaEliteTiers { get; private set; }
-    public static CombatDirector.EliteTierDef VanillaFirstTierDef { get; private set; }
-    public static CombatDirector.EliteTierDef VanillaEliteOnlyFirstTierDef { get; private set; }
+    #region Combat Director API
 
     /// <summary>
     /// Returns the current elite tier definitions used by the Combat Director for doing its elite spawning while doing a run.
@@ -315,12 +308,6 @@ public static partial class EliteAPI
         EliteAPI.SetHooks();
         return CombatDirector.eliteTiers;
     }
-
-    private static bool _combatDirectorInitialized;
-
-    public static int VanillaEliteTierCount;
-    private static readonly List<CombatDirector.EliteTierDef> CustomEliteTierDefs = new List<CombatDirector.EliteTierDef>();
-    public static int CustomEliteTierCount => CustomEliteTierDefs.Count;
 
     /// <summary>
     /// The EliteTierDef array is used by the Combat Director for doing its elite spawning while doing a run.
@@ -403,5 +390,5 @@ public static partial class EliteAPI
         return indexToInsertAt;
     }
 
-    #endregion Combat Director Modifications
+    #endregion Combat Director API
 }
