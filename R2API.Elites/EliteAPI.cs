@@ -378,7 +378,6 @@ public static partial class EliteAPI
     public static int AddCustomEliteTier(CombatDirector.EliteTierDef eliteTierDef, int indexToInsertAt = -1)
     {
         EliteAPI.SetHooks();
-        var eliteTiersSize = VanillaEliteTierCount + CustomEliteTierCount;
 
         var currentEliteTiers = GetCombatDirectorEliteTiers();
         if (currentEliteTiers != null)
