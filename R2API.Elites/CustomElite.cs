@@ -65,10 +65,31 @@ public class CustomElite
         EliteDef = eliteDef;
         EliteTierDefs = eliteTierDefs;
     }
+
     /// <inheritdoc cref="CustomElite(string?, EquipmentDef, Color32, string?, IEnumerable{CombatDirector.EliteTierDef})"/>
     public CustomElite(EliteDef? eliteDef, IEnumerable<CombatDirector.EliteTierDef> eliteTierDefs, Texture2D eliteRamp)
     {
         EliteDef = eliteDef;
+        EliteTierDefs = eliteTierDefs;
+        EliteRamp = eliteRamp;
+    }
+
+    /// <inheritdoc cref="CustomElite(string?, EquipmentDef, Color32, string?, IEnumerable{CombatDirector.EliteTierDef})"/>
+    public CustomElite(EliteDef? eliteDef, VanillaEliteTier eliteTier, Texture2D eliteRamp = null)
+    {
+        EliteDef = eliteDef;
+        EliteTierDefs = eliteTierDefs;
+        EliteRamp = eliteRamp;
+    }
+
+    /// <inheritdoc cref="CustomElite(string?, EquipmentDef, Color32, string?, IEnumerable{CombatDirector.EliteTierDef})"/>
+    public CustomElite(string? name, EquipmentDef equipmentDef, Color32 color, string? modifierToken, VanillaEliteTier eliteTier, Texture2D eliteRamp = null)
+    {
+        EliteDef = ScriptableObject.CreateInstance<EliteDef>();
+        EliteDef.name = name;
+        EliteDef.eliteEquipmentDef = equipmentDef;
+        EliteDef.color = color;
+        EliteDef.modifierToken = modifierToken;
         EliteTierDefs = eliteTierDefs;
         EliteRamp = eliteRamp;
     }

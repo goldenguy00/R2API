@@ -4,7 +4,7 @@
 /// The vanilla elite tiers.
 /// Can be casted to an int to index into the EliteAPI.VanillaEliteTiers array.
 /// </summary>
-public enum EliteTier
+public enum VanillaEliteTier
 {
     /// <summary>
     /// No Tier. Reserved for spawning non-elites.
@@ -27,13 +27,13 @@ public enum EliteTier
     /// Guilded Tier 1 Honor.
     /// Spawns on stage 3 and above with the Honor artifact enabled.
     /// </summary>
-    GuildedTier1Honor,
+    GildedTier1Honor,
 
     /// <summary>
     /// Guilded Tier 1.
     /// Spawns on stage 3 and above.
     /// </summary>
-    GuildedTier1,
+    GildedTier1,
 
     /// <summary>
     /// Tier 2.
